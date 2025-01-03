@@ -1,58 +1,108 @@
-let historybutton = document.getElementById('historybutton');
-let history = document.getElementById('history');
-let bar1 = document.getElementById('bar1');
-let bar2 = document.getElementById('bar2');
-let dis = document.getElementById('answer');
+const lightTheme = "styles/light.css";
+const darkTheme = "styles/dark.css";
+const sunIcon = "assets/SunIcon.svg";
+const moonIcon = "assets/MoonIcon.svg";
+const themeIcon = document.getElementById("theme-icon");
+const res = document.getElementById("result");
+const toast = document.getElementById("toast");
 
-function showHistory() {
-    let calcHistory = JSON.parse(localStorage.getItem("calcHistory")) || [];
-    let len = calcHistory.length;
-
-    history.innerHTML = '';
-
-    bar1.style.display = 'block';
-    bar2.style.display = 'block';
-    if (len === 0) {
-        let historyItem = document.createElement('div');
-        historyItem.innerHTML = "There's no history yet.";
-        historyItem.className = 'historyelement his';
-        historyItem.style.fontSize = '25px';
-        history.appendChild(historyItem);
-    } else {
-        for (let index = len-1; index >= 0; index--) {
-            const element = calcHistory[index];
-            let historyItem = document.createElement('div');
-            historyItem.className = 'historyelement';
-            historyItem.innerHTML = `${element.lastScreenValue} = <span style="color: ${element.result < 0 ? 'red' : 'green'}">${element.result}</span>`;//Actually I have added this that makes red color in the history section .............
-            history.appendChild(historyItem);
-            if (index > 0) history.appendChild(document.createElement('hr'));
-        }
-    }
-
-    history.style.display = 'block';
+function calculate(value) {
+  const calculatedValue = eval(value || null);
+  if (isNaN(calculatedValue)) {
+    res.value = "Can't divide 0 with 0";
+    setTimeout(() => {
+      res.value = "";
+    }, 1300);
+  } else {
+    res.value = calculatedValue;
+  }
 }
 
-historybutton.addEventListener('click', showHistory);
-
-function clearAll(){
-    dis.value = '';
+// Swaps the stylesheet to achieve dark mode.
+function changeTheme() {
+  const theme = document.getElementById("theme");
+  setTimeout(() => {
+    toast.innerHTML = "Calculator";
+  }, 1500);
+  if (theme.getAttribute("href") === lightTheme) {
+    theme.setAttribute("href", darkTheme);
+    themeIcon.setAttribute("src", sunIcon);
+    toast.innerHTML = "Dark Mode 🌙";
+  } else {
+    theme.setAttribute("href", lightTheme);
+    themeIcon.setAttribute("src", moonIcon);
+    toast.innerHTML = "Light Mode ☀️";
+  }
 }
 
-function hide(){
-    history.style.display = 'none';
-    bar1.style.display = 'none';
-    bar2.style.display = 'none';
+// Displays entered value on screen.
+function liveScreen(enteredValue) {
+  if (!res.value) {
+    res.value = "";
+  }
+  res.value += enteredValue;
 }
-function deleteLastEntry() {
-    let calcHistory = JSON.parse(localStorage.getItem("calcHistory")) || [];
-    if (calcHistory.length > 0) {
-      calcHistory.pop(); 
-      localStorage.setItem("calcHistory", JSON.stringify(calcHistory));
-      showHistory(); // It open each time when u click on CE if u dont want then u can remove it ....
-    }
+
+//adding event handler on the document to handle keyboard inputs
+document.addEventListener("keydown", keyboardInputHandler);
+
+//function to handle keyboard inputs
+function keyboardInputHandler(e) {
+  // to fix the default behavior of browser,
+  // enter and backspace were causing undesired behavior when some key was already in focus.
+  e.preventDefault();
+  //grabbing the liveScreen
+
+  //numbers
+  if (e.key === "0") {
+    res.value += "0";
+  } else if (e.key === "1") {
+    res.value += "1";
+  } else if (e.key === "2") {
+    res.value += "2";
+  } else if (e.key === "3") {
+    res.value += "3";
+  } else if (e.key === "4") {
+    res.value += "4";
+  } else if (e.key === "5") {
+    res.value += "5";
+  } else if (e.key === "6") {
+    res.value += "6";
+  } else if (e.key === "7") {
+    res.value += "7";
+  } else if (e.key === "7") {
+    res.value += "7";
+  } else if (e.key === "8") {
+    res.value += "8";
+  } else if (e.key === "9") {
+    res.value += "9";
   }
 
+  //operators
+  if (e.key === "+") {
+    res.value += "+";
+  } else if (e.key === "-") {
+    res.value += "-";
+  } else if (e.key === "*") {
+    res.value += "*";
+  } else if (e.key === "/") {
+    res.value += "/";
+  }
 
+  //decimal key
+  if (e.key === ".") {
+    res.value += ".";
+  }
 
-bar1.addEventListener('click', hide);
-bar2.addEventListener('click', hide);
+  //press enter to see result
+  if (e.key === "Enter") {
+    calculate(result.value);
+  }
+
+  //backspace for removing the last input
+  if (e.key === "Backspace") {
+    const resultInput = res.value;
+    //remove the last element in the string
+    res.value = resultInput.substring(0, res.value.length - 1);
+  }
+}
